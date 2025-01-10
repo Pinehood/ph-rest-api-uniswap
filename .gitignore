@@ -1,0 +1,13 @@
+/node_modules
+/.idea
+/.awcache
+/.vscode
+/quick-start
+/test
+/coverage
+/.nyc_output
+/dist
+npm-debug.log
+storage-*.json
+.env.prod
+.env.test
