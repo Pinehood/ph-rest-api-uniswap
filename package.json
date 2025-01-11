@@ -9,7 +9,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "ph-rest-api-uniswap": "file:",
-    "ph-typescript-lib-uniswap": "1.0.4"
+    "ph-typescript-lib-uniswap": "^1.0.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
