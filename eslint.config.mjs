@@ -11,4 +11,4 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-export default [...compat.extends("prettier", "eslint-config-ts-ph")];
+export default [...compat.extends("prettier")];
