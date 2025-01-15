@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import {
   generatePrivateKeyAndContractAddress,
   UniswapClient,
@@ -8,7 +9,7 @@ const defaultRpcUrl = process.env.DEFAULT_RPC_URL || "https://eth.llamarpc.com";
 const defaultApiKey =
   process.env.DEFAULT_API_KEY || "d9023r892hrwiuhag83tzgqg438ct";
 
-const getClient = (req, privKey) => {
+const getClient = (req: Request, res: Response, privKey: string) => {
   try {
     if (req.headers["x-api-key"] !== defaultApiKey) {
       res.status(401).json({ error: "Unauthorized 'x-api-key'" });
@@ -16,7 +17,7 @@ const getClient = (req, privKey) => {
     }
     const { chainId, rpcUrl } = req.query;
     return new UniswapClient({
-      chainId: Number(chainId) || defaultChainId,
+      chainId: Number(chainId) || Number(defaultChainId),
       rpcUrl: String(rpcUrl) || defaultRpcUrl,
       privKey,
     });
@@ -26,7 +27,7 @@ const getClient = (req, privKey) => {
   return null;
 };
 
-const getInfoAndClient = async (req) => {
+const getInfoAndClient = async (req: Request, res: Response) => {
   try {
     const { mnemonic, tokenIn } = req.query;
     if (!mnemonic || !tokenIn) {
@@ -39,7 +40,7 @@ const getInfoAndClient = async (req) => {
       String(tokenIn),
     );
 
-    const client = getClient(req, info.key);
+    const client = getClient(req, res, info.key);
     if (!client) {
       return null;
     }
@@ -65,10 +66,10 @@ const getInfoAndClient = async (req) => {
   return null;
 };
 
-export const balance = async (req, res) => {
+export const balance = async (req: Request, res: Response) => {
   try {
-    const { info, client } = await getInfoAndClient(req);
-    if (!info || !client) {
+    const { info, client } = (await getInfoAndClient(req, res)) ?? {};
+    if (!info || !client || !info.address) {
       return;
     }
     res.status(200).json({ balance: await client.getBalance(info.address) });
@@ -77,11 +78,11 @@ export const balance = async (req, res) => {
   }
 };
 
-export const trade = async (req, res, preview) => {
+export const trade = async (req: Request, res: Response, preview: boolean) => {
   try {
     const { tokenIn, tokenOut, amountToSwap, needApproval, approvalMax } =
       req.body;
-
+    const mnemonic = (req.query.mnemonic as string) ?? "";
     if (!tokenIn || !tokenOut || amountToSwap === undefined) {
       res.status(400).json({
         error:
@@ -114,7 +115,7 @@ export const trade = async (req, res, preview) => {
       return;
     }
 
-    const client = getClient(req, infoIn.address);
+    const client = getClient(req, res, infoIn.address);
     if (!client) {
       return;
     }
@@ -132,4 +133,8 @@ export const trade = async (req, res, preview) => {
   } catch (error) {
     res.status(500).json({ error });
   }
+};
+
+export const ping = (_: Request, res: Response) => {
+  res.status(200).json({ pong: true });
 };

@@ -11,4 +11,19 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-export default [...compat.extends("prettier")];
+export default [
+  ...compat.extends(
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "eslint-config-ts-ph",
+  ),
+  {
+    rules: {
+      "@typescript-eslint/no-namespace": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-unsafe-function-type": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+    },
+  },
+];
