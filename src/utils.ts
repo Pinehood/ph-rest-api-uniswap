@@ -4,10 +4,13 @@ import {
   UniswapClient,
 } from "ph-typescript-lib-uniswap";
 
-const defaultChainId = process.env.DEFAULT_CHAIN_ID || 1;
-const defaultRpcUrl = process.env.DEFAULT_RPC_URL || "https://eth.llamarpc.com";
+const defaultChainId = Number(process.env.DEFAULT_CHAIN_ID) || 1;
+const defaultRpcUrl =
+  String(process.env.DEFAULT_RPC_URL) || "https://eth.llamarpc.com";
 const defaultApiKey =
-  process.env.DEFAULT_API_KEY || "d9023r892hrwiuhag83tzgqg438ct";
+  String(process.env.DEFAULT_API_KEY) || "d9023r892hrwiuhag83tzgqg438ct";
+const defaultSlippage = Number(process.env.DEFAULT_SLIPPAGE) || 0.5;
+const defaultDeadline = Number(process.env.DEFAULT_DEADLINE) || 15;
 
 const getClient = (req: Request, res: Response, privKey: string) => {
   try {
@@ -15,11 +18,18 @@ const getClient = (req: Request, res: Response, privKey: string) => {
       res.status(401).json({ error: "Unauthorized 'x-api-key'" });
       return null;
     }
-    const { chainId, rpcUrl } = req.query;
+    const {
+      chainId = defaultChainId,
+      rpcUrl = defaultRpcUrl,
+      slippage = defaultSlippage,
+      deadline = defaultDeadline,
+    } = req.query;
     return new UniswapClient({
-      chainId: Number(chainId) || Number(defaultChainId),
-      rpcUrl: String(rpcUrl) || defaultRpcUrl,
       privKey,
+      chainId: Number(chainId),
+      rpcUrl: String(rpcUrl),
+      slippage: Number(slippage),
+      deadline: Number(deadline),
     });
   } catch (error) {
     res.status(500).json({ error });
@@ -82,8 +92,8 @@ export const trade = async (req: Request, res: Response, preview: boolean) => {
   try {
     const { tokenIn, tokenOut, amountToSwap, needApproval, approvalMax } =
       req.body;
-    const mnemonic = (req.query.mnemonic as string) ?? "";
-    if (!tokenIn || !tokenOut || amountToSwap === undefined) {
+    const mnemonic = req.query.mnemonic as string;
+    if (!mnemonic || !tokenIn || !tokenOut || amountToSwap === undefined) {
       res.status(400).json({
         error:
           "'mnemonic', 'tokenIn', 'tokenOut', and 'amountToSwap' are required",
@@ -101,7 +111,7 @@ export const trade = async (req: Request, res: Response, preview: boolean) => {
       String(tokenOut),
     );
 
-    if (!tokenIn.key || !tokenOut.key) {
+    if (!infoIn.key || !infoOut.key) {
       res
         .status(400)
         .json({ error: "Private keys were not properly generated" });
@@ -115,14 +125,14 @@ export const trade = async (req: Request, res: Response, preview: boolean) => {
       return;
     }
 
-    const client = getClient(req, res, infoIn.address);
+    const client = getClient(req, res, infoIn.key);
     if (!client) {
       return;
     }
 
     const result = await client.swapTokens(
-      infoIn.address,
-      infoOut.address,
+      infoIn.contract ?? infoIn.address,
+      infoOut.contract ?? infoOut.address,
       Number(amountToSwap),
       Boolean(preview),
       Boolean(needApproval),
