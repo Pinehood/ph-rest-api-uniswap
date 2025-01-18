@@ -6,7 +6,7 @@
 })();
 
 import express, { json } from "express";
-import { balance, ping, trade } from "./utils";
+import { balance, ping, trade } from "./logic";
 
 const app = express();
 app.use(json());
