@@ -2,7 +2,7 @@
   "name": "ph-rest-api-uniswap",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint \"./src/**/*.js\"",
+    "lint": "eslint \"./src/**/*.ts\"",
     "build": "tsc",
     "start": "npx ts-node ./src/main.ts",
     "start:prod": "node ./dist/main.js"
