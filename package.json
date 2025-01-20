@@ -11,7 +11,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "ph-rest-api-uniswap": "file:",
-    "ph-typescript-lib-uniswap": "1.1.4"
+    "ph-typescript-lib-uniswap": "^1.1.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -19,8 +19,8 @@
     "@types/express": "^5.0.0",
     "@types/module-alias": "^2.0.4",
     "@types/nodemailer": "^6.4.17",
-    "@typescript-eslint/eslint-plugin": "^8.19.1",
-    "@typescript-eslint/parser": "^8.19.1",
+    "@typescript-eslint/eslint-plugin": "^8.21.0",
+    "@typescript-eslint/parser": "^8.21.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-config-ts-ph": "^1.0.7",
